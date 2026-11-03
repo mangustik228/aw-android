@@ -203,6 +203,9 @@ class BackgroundService : Service() {
         // Schedule activity-time notifications (aw-notify)
         scheduleNotifyChecks()
 
+        // Copy this device's buckets to the self-hosted aw-server
+        scheduleRemotePush()
+
         isFullyStarted = true
         // A sticky recreation can occur while the app is backgrounded, where Android 12+
         // may reject foreground promotion. Only explicit, eligible callers restart us.
@@ -300,6 +303,27 @@ class BackgroundService : Service() {
             notifyRequest
         )
         Log.i(TAG, "Scheduled activity-time notification worker (every 15 minutes)")
+    }
+
+    private fun scheduleRemotePush() {
+        val pushRequest = androidx.work.PeriodicWorkRequest.Builder(
+            net.activitywatch.android.workers.RemotePushWorker::class.java,
+            15, java.util.concurrent.TimeUnit.MINUTES
+        )
+            .setConstraints(
+                androidx.work.Constraints.Builder()
+                    .setRequiredNetworkType(androidx.work.NetworkType.CONNECTED)
+                    .build()
+            )
+            .addTag("RemotePushWorker")
+            .build()
+
+        androidx.work.WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "RemotePushWorker",
+            androidx.work.ExistingPeriodicWorkPolicy.KEEP,
+            pushRequest
+        )
+        Log.i(TAG, "Scheduled push to ${BuildConfig.REMOTE_SERVER_URL} (every 15 minutes)")
     }
 
     private fun scheduleEventParsing() {

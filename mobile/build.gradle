@@ -22,6 +22,12 @@ android {
         // a normal install without contending for the same port.
         buildConfigField "int", "SERVER_PORT", "5600"
 
+        // Self-hosted aw-server that RemotePushWorker copies this device's buckets to
+        // (tailnet address). Override with -PremoteServerUrl=...; an empty value disables
+        // the push. A new host also needs a cleartext entry in network_security_config.xml.
+        buildConfigField "String", "REMOTE_SERVER_URL",
+            "\"${project.findProperty('remoteServerUrl') ?: 'http://100.83.127.94:5600'}\""
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         // NOTE: This only works for API level 28 and above
         //testInstrumentationRunnerArguments useTestStorageService: 'true'

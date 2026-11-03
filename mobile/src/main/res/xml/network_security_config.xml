@@ -3,5 +3,9 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">127.0.0.1</domain>
         <domain includeSubdomains="true">localhost</domain>
+        <!-- Self-hosted aw-server (REMOTE_SERVER_URL): reachable only over Tailscale,
+             which already encrypts the traffic -->
+        <domain includeSubdomains="false">100.83.127.94</domain>
+        <domain includeSubdomains="true">ts.net</domain>
     </domain-config>
 </network-security-config>
